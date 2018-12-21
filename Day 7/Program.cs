@@ -16,7 +16,6 @@ internal class Program
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var steps = new Tuple<string, string>[input.Length];
         var dependencies = new SortedDictionary<string, string>();
 
         foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
@@ -30,7 +29,6 @@ internal class Program
             string[] split = s.Split(' ');
             string before = split[1];
             string after = split[7];
-            steps[i] = new Tuple<string, string>(before, after);
             dependencies[after] += before;
         }
 
@@ -57,7 +55,65 @@ internal class Program
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
+        var dependencies = new SortedDictionary<string, string>();
+
+        foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
+        {
+            dependencies.Add(letter.ToString(), "");
+        }
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            string s = input[i];
+            string[] split = s.Split(' ');
+            string before = split[1];
+            string after = split[7];
+            dependencies[after] += before;
+        }
+
+        int tick = 0;
+        string complete = string.Empty;
+
+        const int workers = 5;
+        const int baseTime = 60;
+        var workers = new List<Worker>();
+        for (int i = 0; i < 5; i++)
+        {
+            workers.Add(new Worker(i));
+        }
+
+        while (complete.Length < 26)
+        {
+            foreach (var worker in workers)
+            {
+                if (string.IsNullOrEmpty(worker.CurrentTask))
+                {
+                    string next = dependencies.FirstOrDefault(d => string.IsNullOrWhiteSpace(d.Value)).Key ?? "";
+                    int time = next.Length > 0 ? next.ToCharArray()[0] - 64 + baseTime : -1;
+                    worker.CurrentTask = next;
+                    worker.TimeLeft = time;
+                }
+                worker.TimeLeft--;
+            }
+            tick++;
+        }
+
+
         sw.Stop();
         Console.WriteLine(sw.Elapsed);
+    }
+}
+
+internal class Worker
+{
+    public readonly int ID { get; }
+    public int TimeLeft { get; set; }
+    public string CurrentTask { get; set; }
+
+    Worker(int id)
+    {
+        ID = id;
+        CurrentTask = "";
+        TimeLeft = -1;
     }
 }
