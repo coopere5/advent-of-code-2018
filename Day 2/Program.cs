@@ -8,7 +8,7 @@ class Program
     static int three = 0;
     static void Main(string[] args)
     {
-        string[] input = System.IO.File.ReadAllLines(@"C:\Users\ecooper\Desktop\AoC\Day 2\input.txt");
+        string[] input = System.IO.File.ReadAllLines(@"input.txt");
 
         for (int i = 0; i < input.Length; i++)
         {
@@ -70,7 +70,7 @@ class Program
 
     private static void PartOne()
     {
-        string[] input = System.IO.File.ReadAllLines(@"C:\Users\ecooper\Desktop\AoC\Day 2\input.txt");
+        string[] input = System.IO.File.ReadAllLines(@"input.txt");
 
         foreach (var value in input)
         {
