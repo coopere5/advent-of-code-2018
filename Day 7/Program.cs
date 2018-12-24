@@ -6,8 +6,6 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        Console.WriteLine("Attaching...");
-        Console.ReadKey();
         string[] input = System.IO.File.ReadAllLines(@"input.txt");
 
         //PartOne(input);
@@ -18,7 +16,7 @@ internal class Program
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var dependencies = new SortedDictionary<string, string>();
+        var dependencies = new Dictionary<string, string>();
 
         foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
         {
@@ -53,16 +51,11 @@ internal class Program
         Console.WriteLine(sw.Elapsed);
     }
 
-    private static void PartTwo(string[] input) //the answer was 1053, which is off by one from what I got (1054)
+    private static void PartTwo(string[] input) //answer: 1053 (returns 1054, off by one, because the last one completes before the last tick actually happens)
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var dependencies = new SortedDictionary<string, string>();
-
-        // foreach (var letter in "abcdef".ToUpper().ToArray()) //test
-        // {
-        //     dependencies.Add(letter.ToString(), "");
-        // }
+        var dependencies = new Dictionary<string, string>();
 
         foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
         {
@@ -97,7 +90,6 @@ internal class Program
                 {
                     if (!string.IsNullOrEmpty(worker.CurrentTask))
                     {
-                        Console.Write(worker.TimeLeft + " ");
                         Console.WriteLine("Completed " + worker.CurrentTask + " at " + tick);
                         complete += worker.CurrentTask;
                         foreach (var key in dependencies.Keys.ToArray())
