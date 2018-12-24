@@ -53,7 +53,7 @@ internal class Program
         Console.WriteLine(sw.Elapsed);
     }
 
-    private static void PartTwo(string[] input)
+    private static void PartTwo(string[] input) //the answer was 1053, which is off by one from what I got (1054)
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
