@@ -86,8 +86,9 @@ internal class Program
         {
             foreach (var worker in workers)
             {
-                if (string.IsNullOrEmpty(worker.CurrentTask))
+                if (worker.TimeLeft>=0)
                 {
+                    complete += worker.CurrentTask;
                     string next = dependencies.FirstOrDefault(d => string.IsNullOrWhiteSpace(d.Value)).Key ?? "";
                     int time = next.Length > 0 ? next.ToCharArray()[0] - 64 + baseTime : -1;
                     worker.CurrentTask = next;
