@@ -8,15 +8,15 @@ internal class Program
     {
         string[] input = System.IO.File.ReadAllLines(@"input.txt");
 
-        PartOne(input);
-        //PartTwo(input);
+        //PartOne(input);
+        PartTwo(input);
     }
 
     private static void PartOne(string[] input)
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var dependencies = new SortedDictionary<string, string>();
+        var dependencies = new Dictionary<string, string>();
 
         foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
         {
@@ -51,11 +51,11 @@ internal class Program
         Console.WriteLine(sw.Elapsed);
     }
 
-    private static void PartTwo(string[] input)
+    private static void PartTwo(string[] input) //answer: 1053 (returns 1054, off by one, because the last one completes before the last tick actually happens)
     {
         System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
-        var dependencies = new SortedDictionary<string, string>();
+        var dependencies = new Dictionary<string, string>();
 
         foreach (var letter in "abcdefghijklmnopqrstuvwxyz".ToUpper().ToArray())
         {
@@ -74,10 +74,10 @@ internal class Program
         int tick = 0;
         string complete = string.Empty;
 
-        const int workers = 5;
+        const int numWorkers = 5;
         const int baseTime = 60;
         var workers = new List<Worker>();
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < numWorkers; i++)
         {
             workers.Add(new Worker(i));
         }
@@ -86,20 +86,32 @@ internal class Program
         {
             foreach (var worker in workers)
             {
-                if (worker.TimeLeft>=0)
+                if (worker.TimeLeft <= 0)
                 {
-                    complete += worker.CurrentTask;
+                    if (!string.IsNullOrEmpty(worker.CurrentTask))
+                    {
+                        Console.WriteLine("Completed " + worker.CurrentTask + " at " + tick);
+                        complete += worker.CurrentTask;
+                        foreach (var key in dependencies.Keys.ToArray())
+                        {
+                            dependencies[key] = dependencies[key].Replace(worker.CurrentTask, "");
+                        }
+                        worker.CurrentTask = "";
+                    }
+
                     string next = dependencies.FirstOrDefault(d => string.IsNullOrWhiteSpace(d.Value)).Key ?? "";
                     int time = next.Length > 0 ? next.ToCharArray()[0] - 64 + baseTime : -1;
                     worker.CurrentTask = next;
                     worker.TimeLeft = time;
+                    dependencies.Remove(worker.CurrentTask);
+
+                    if (!string.IsNullOrEmpty(next)) Console.WriteLine("Started: " + next + " at " + tick + " time: " + time);
                 }
                 worker.TimeLeft--;
             }
             tick++;
         }
-
-
+        Console.WriteLine(complete);
         sw.Stop();
         Console.WriteLine(sw.Elapsed);
     }
@@ -107,11 +119,11 @@ internal class Program
 
 internal class Worker
 {
-    public readonly int ID { get; }
+    public int ID { get; private set; }
     public int TimeLeft { get; set; }
     public string CurrentTask { get; set; }
 
-    Worker(int id)
+    public Worker(int id)
     {
         ID = id;
         CurrentTask = "";
